@@ -1,32 +1,68 @@
 import Notiflix from 'notiflix';
-import SimpleLightbox from "simplelightbox";
+import SimpleLightbox from 'simplelightbox';
 
-import "simplelightbox/dist/simple-lightbox.min.css";
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import './css/styles.css';
 
 const refs = {
-    input:document.querySelector('input'),
-    btn:document.querySelector('button'),
+  form: document.querySelector('#search-form'),
+  gallery: document.querySelector('.gallery'),
+};
+
+refs.form.addEventListener('submit', onSubmit);
+
+
+function onSubmit(e) {
+  e.preventDefault();
+ const searchImage = e.target[0].value;
+ 
+  fetchCountries(searchImage)
+    .then(data => {
+      const files = data.hits;
+      files.map(file => {
+        appendMarkupPhoto(file);
+      });
+    })
+    .catch(error => console.log(error));
 }
 
-// let inputValue ;
-
-refs.input.addEventListener('input', onInput);
-refs.btn.addEventListener('submit', onSubmit);
-
-
-function onInput(){
-    inputValue =  refs.input.value.trim();
+function fetchCountries(search) {
+  return fetch(
+    `https://pixabay.com/api/?key=34706301-fa7c25ab6ec07e5fc9fe6ac6d&q=${search}&image_type=photo&orientation=horizontal&safesearch=true&fields=webformatURL,largeImageURL,tags,likes,views,comments,downloads`
+  ).then(response => response.json());
 }
 
-function fetchCountries(){
-    return fetch('https://pixabay.com/api/?key=34706301-fa7c25ab6ec07e5fc9fe6ac6d&q=cat&image_type=photo&orientation=horizontal&safesearch=true')
-    .then(res=> res.json)
+function appendMarkupPhoto(file) {
+  const {
+    webformatURL,
+    largeImageURL,
+    tags,
+    likes,
+    views,
+    comments,
+    downloads,
+  } = file;
+
+  const galleryMarkup = `
+    <div class="photo-card">
+  <a href = ${largeImageURL} class = 'link'>
+  <img class = 'img' src="${webformatURL}" alt="${tags}" loading="lazy" />
+   </a>
+  <div class="info">
+    <p class="info-item">
+      <b>Likes</b>${likes}
+    </p>
+    <p class="info-item">
+      <b>Views</b>${views}
+    </p>
+    <p class="info-item">
+      <b>Comments</b>${comments}
+    </p>
+    <p class="info-item">
+      <b>Downloads</b>${downloads}
+    </p>
+  </div>
+</div>
+`;
+  refs.gallery.insertAdjacentHTML('beforeend', galleryMarkup);
 }
-function onSubmit(e){
-    e.preventDefault();
-
-}
-fetchCountries(inputValue).then(photo=>console.log(photo));
-
-
