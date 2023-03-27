@@ -1,6 +1,6 @@
 import { refs } from '.';
 
-export function appendMarkupPhoto(file) {
+export async function appendMarkupPhoto(file) {
   const {
     webformatURL,
     largeImageURL,
