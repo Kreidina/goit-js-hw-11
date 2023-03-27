@@ -95,14 +95,15 @@ async function onLoadMore() {
 
 function simpl() {
   let selector = document.querySelectorAll('.photo-card a');
-  if (selector) {
+  // console.log(selector);
+  if (selector.length > 0) {
     const lightbox = new SimpleLightbox(selector, {
       onSlideChange: () => {
         lightbox.refresh();
       },
     });
   } else {
-    console.error('Invalid selector');
-    return null;
+    refs.gallery.innerHTML = '';
+    return;
   }
 }
